@@ -1,0 +1,66 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <sstream>
+
+using namespace std;
+
+// Структура для представления информации о человеке
+struct Person {
+    string firstname;
+    int secondname;
+    int gender;
+    int marks;
+    string group;
+};
+
+// Функция для чтения списка людей из файла
+vector<Person> readPeopleFromFile(const string& filename) {
+    vector<Person> people;
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Unable to open file: " << filename << endl;
+        return people;
+    }
+
+    string line;
+    while (getline(file, line)) {
+        Person person;
+        // Предполагаем, что каждая строка в файле имеет формат "Имя Возраст Профессия"
+        stringstream ss(line);
+        ss >> person.firstname >> person.secondname >> person.gender >> person.marks >> person.group;
+        people.push_back(person);
+    }
+
+    file.close();
+    return people;
+}
+
+// Функция для вывода людей, соответствующих запросу
+void printPeopleWithQuery(const vector<Person>& people, const string& query) {
+    bool found = false;
+    for (const auto& person : people) {
+        // Поиск по имени или профессии
+        if (person.marks == query || person.firstname == query) {
+            found = true;
+            cout << "Firstname: " << person.firstname << ", Secondname: " << person.secondname << ", Gender: " << person.gender << ", Marks: " << person.marks << ", Group: " << person.group << endl;
+        }
+    }
+    if (!found) {
+        cout << "No people found with the query: " << query << endl;
+    }
+}
+
+int main() {
+    string filename = "people.txt"; // Имя файла со списком людей
+    string query;
+
+    cout << "Enter your query (name or occupation): ";
+    getline(cin, query);
+
+    vector<Person> people = readPeopleFromFile(filename);
+    printPeopleWithQuery(people, query);
+
+    return 0;
+}
